@@ -64,6 +64,7 @@
 				E99AC7982A9DE2DB00180903 /* StorageManager */,
 				E94F5CC42A9D1E3E0054AD76 /* Model */,
 				A83A1D6329D9ECCB000B0D27 /* Info.plist */,
+				A83A1D5B29D9ECCA000B0D27 /* TaskList.xcdatamodeld */,
 			);
 			path = TaskList;
 			sourceTree = "<group>";
@@ -105,7 +106,6 @@
 			isa = PBXGroup;
 			children = (
 				E99AC7962A9DE2BA00180903 /* StorageManager.swift */,
-				A83A1D5B29D9ECCA000B0D27 /* TaskList.xcdatamodeld */,
 			);
 			path = StorageManager;
 			sourceTree = "<group>";
