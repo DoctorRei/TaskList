@@ -6,14 +6,12 @@
 //
 
 import UIKit
-import CoreData
 
 class TaskListViewController: UITableViewController {
     
     private let cellID = "task"
+    private let dataStore = StorageManager.shared
     private var taskList: [Task] = []
-    
-    private let viewContext = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,15 +26,6 @@ class TaskListViewController: UITableViewController {
         showAddTaskAlert(withTitle: "New Task", andMessage: "What do you want to do?")
     }
     	
-    private func fetchData() {
-        let fetchRequest = Task.fetchRequest()
-        
-        do {
-            taskList = try viewContext.fetch(fetchRequest)
-        } catch {
-            print(error)
-        }
-    }
     
     // MARK: - Alert Controllers
     
@@ -62,7 +51,7 @@ class TaskListViewController: UITableViewController {
         
         let editConformAction = UIAlertAction(title: "Save", style: .default) { [weak self] _ in
             guard let task = alert.textFields?.first?.text, !task.isEmpty else { return }
-            self?.editCellTask(task)
+//            self?.editCellTask(task)
         }
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
@@ -79,38 +68,38 @@ class TaskListViewController: UITableViewController {
     
     // MARK: - Private Support methods
     
-    private func editCellTask(_ taskName: String) {
-        let task = Task(context: viewContext)
-        task.title = taskName
-        
-        let selectedIndexPath = self.tableView.indexPathForSelectedRow
-        self.taskList[selectedIndexPath?.row ?? 0] = task
-        self.tableView.reloadData()
-        
-        if viewContext.hasChanges {
-            do {
-                try viewContext.save()
-            } catch {
-                print(error)
+//    private func editCellTask(_ taskName: String) {
+//        let task = Task(context: viewContext)
+//        task.title = taskName
+//
+//        let selectedIndexPath = self.tableView.indexPathForSelectedRow
+//        self.taskList[selectedIndexPath?.row ?? 0] = task
+//        self.tableView.reloadData()
+//
+//        if viewContext.hasChanges {
+//            do {
+//                try viewContext.save()
+//            } catch {
+//                print(error)
+//            }
+//        }
+//    }
+    
+    private func fetchData() {
+        dataStore.fetchData { [unowned self] result in
+            switch result {
+            case .success(let taskList):
+                self.taskList = taskList
+            case .failure(let error):
+                print(error.localizedDescription)
             }
         }
-        
     }
     
     private func save(_ taskName: String) {
-        let task = Task(context: viewContext)
-        task.title = taskName
-        taskList.append(task)
-        
-        let indexPath = IndexPath(row: taskList.count - 1, section: 0)
-        tableView.insertRows(at: [indexPath], with: .automatic)
-        
-        if viewContext.hasChanges {
-            do {
-                try viewContext.save()
-            } catch {
-                print(error)
-            }
+        dataStore.create(taskName) { task in
+            taskList.append(task)
+            tableView.insertRows(at: [IndexPath(row: self.taskList.count - 1, section: 0)], with: .automatic)
         }
     }
 }
@@ -161,11 +150,16 @@ extension TaskListViewController {
         showEditTaskAlert(withTitle: "Edit Task", andMessage: "")
     }
     
+    
+    
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        
-
-        
+        if editingStyle == .delete {
+            let task = taskList.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+            dataStore.delete(that: task)
+        }
     }
+    
     
     
 }
