@@ -19,7 +19,6 @@ class TaskListViewController: UITableViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
         setupNavigationBar()
         fetchData()
-        
     }
     
     private func addNewTask() {
@@ -137,15 +136,11 @@ extension TaskListViewController {
         showEditTaskAlert(withTitle: "Edit", andMessage: "") { [unowned self] edditTask in
             self.dataStore.edditing(task, newValue: edditTask)
             tableView.reloadRows(at: [indexPath], with: .automatic)
-        }
+        }
         
         // Этот код просто моя гордость. Плевать, как он ущербен, но я смог сам написать комплишен, реализовать его и все получилось! Я уже всю уверенность потерять, а тут смог все сделать! Захватил из другого аллерта текст из текстфилда, перенес сюда и заюзал!
         // Единственное, что у меня тут проблема. Я выбираю одну строку - редактирование не вызывается. Я выбираю другую строку - вызывается редактирование. И при редактировании изменяется та строка, которую я выбирал до этого. + Диселект роу не работает почему-то. Но честно, я уже обозлен на это задание и весь учебный настрой оно мне сбило. Можно щемить меня упреками, все принимаю, только подскажите как эту фигню пофиксить ))
-        
-    
     }
-    
-    
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
